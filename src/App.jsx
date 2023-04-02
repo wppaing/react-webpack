@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { lazy } from 'react';
 
 const App = () => {
-  const [value, setValue] = useState(0);
+  const appConfigId = process.env.APPLICATION_CONFIG_ID;
 
-  return (
-    <div>
-      Current Value {value}
-      <button onClick={() => setValue(value + 1)}>Add</button>
-    </div>
-  );
+  if (appConfigId === 1) {
+    return lazy(() => import('./config/MainApp'));
+  } else if (appConfigId === 2) {
+    return lazy(() => import('./config/TestApp'));
+  } else {
+    return null;
+  }
 };
 
 export default App;

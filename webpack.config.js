@@ -1,36 +1,49 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 
-module.exports = {
-  entry: path.resolve(__dirname, 'src', 'index.jsx'),
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'static/js/bundle.[contenthash:8].js',
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
+module.exports = (env, argv) => {
+  console.log(env, argv);
+  return {
+    entry: () => {
+      return path.resolve(__dirname, 'src', 'index.jsx');
     },
-    port: 3000,
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'static/js/[name].[contenthash].js',
+      chunkFilename: 'static/js/[name].[contenthash].chunk.js',
+      clean: true,
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          use: 'babel-loader',
         },
+      ],
+    },
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'dist'),
       },
+      port: 3000,
+    },
+    resolve: {
+      extensions: ['*', '.js', '.jsx'],
+    },
+    plugins: [
+      new HtmlWebPackPlugin({
+        template: path.join(__dirname, 'public', 'index.html'),
+        filename: 'index.html',
+      }),
+      new webpack.DefinePlugin({
+        process: {
+          env: {
+            APPLICATION_CONFIG_ID: 1,
+          },
+        },
+      }),
     ],
-  },
-  resolve: {
-    extensions: ['*', '.js', '.jsx'],
-  },
-  plugins: [
-    new HtmlWebPackPlugin({
-      template: path.join(__dirname, 'public', 'index.html'),
-      filename: 'index.html',
-    }),
-  ],
+  };
 };
